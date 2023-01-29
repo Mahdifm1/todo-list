@@ -1,0 +1,30 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+C:/Users/lotfian.a/CLionProjects/untitled4/main.c
+stdio.h
+-
+string.h
+-
+stdlib.h
+-
+winsock2.h
+-
+server.h
+C:/Users/lotfian.a/CLionProjects/untitled4/server.h
+
+C:/Users/lotfian.a/CLionProjects/untitled4/server.h
+winsock2.h
+-
+unistd.h
+-
+sys/socket.h
+-
+netinet/in.h
+-
+

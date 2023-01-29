@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+    <head>
+        <meta charset="utf-8">
+        <title>Todo App</title>
+        <script type="text/javascript" src="https://code.jquery.com/jquery-3.6.0.min.js">
+        </script>
+        <style media="screen">
+            body{
+                background-color: rgb(100, 100, 100);
+            }
+            h2 {
+                color: white;
+                line-height: 50px;
+                position: absolute;
+                left: 10px;
+                top: 0px;
+                margin: 0;
+                text-align: center;
+                cursor: default;
+            }
+            div {
+                cursor: default;
+            }
+            #app {
+                position: absolute;
+                background-color: black;
+                border-radius: 30px;
+                height: 700px;
+                width: 350px;
+            }
+            #container {
+                height: 590px;
+                width: inherit;
+                position: absolute;
+                top: 50px;
+                overflow-y: scroll;
+                overflow-style: none;
+                scrollbar-width: none;
+            }
+            #add-button {
+                position: absolute;
+                right: 15px;
+                bottom: 20px;
+                height: 60px;
+                width: 60px;
+                border-radius: 30px;
+                background-color: red;
+                color:white;
+                font-size: 4em;
+                line-height: 60px;
+                text-align: center;
+                z-index: 10;
+            }
+            #add-cancle {
+                font-size: 1.4em;
+                position: absolute;
+                top: 10px;
+                left: 20px;
+            }
+            #submit {
+                position: absolute;
+                width: 60px;
+                height: 40px;
+                background-color: rgb(30, 30, 30);
+                border-radius: 10px;
+                bottom: 20px;
+                left: 140px;
+                color: white;
+                line-height: 40px;
+                text-align: center;
+                font-size: 1.4em;
+            }
+            .small-input {
+                position: absolute;
+                background-color: rgb(30, 30, 30);
+                height: 35px;
+                width: 30px;
+                border: none;
+                border-radius: 10px;
+                font-size: 1.5em;
+                color: white;
+                text-align: center;
+            }
+            .big-input {
+                position: absolute;
+                background-color: rgb(30, 30, 30);
+                height: 320px;
+                width: 320px;
+                border: none;
+                border-radius: 10px;
+                font-size: 1.5em;
+                color: white;
+                font-size: 2.4em;
+            }
+            .label {
+                position: absolute;
+                font-size: 1.4em;
+                color: rgb(150, 150, 150);
+                margin: 0;
+            }
+            .todo {
+                top: 20px;
+                height: 100px;
+                width: 320px;
+                margin: 20px 5px 20px 10px;
+                left:500px;
+            }
+            .head {
+                width: 270px;
+                background-color: rgb(30, 30, 30);
+                border-radius: 15px;
+                height: inherit;
+                float: left;
+            }
+            .delete-button{
+                background-color: rgb(30, 30, 30);
+                border-radius: 10px;
+                height: 45px;
+                width: 45px;
+                line-height: 45px;
+                text-align: center;
+                color: white;
+                float: right;
+                font-size: 0.85em;
+                color: red;
+            }
+            .done-button {
+                margin-bottom: 6px;
+                float: right;
+                height: 45px;
+                width: 43px;
+                background-color: rgb(30, 30, 30);
+                border-radius: 10px;
+                border: 1px solid rgb(80, 80, 80);
+            }
+            .date {
+                color: rgb(100, 100, 100);
+                margin: 0px 0 5px 5px;
+                font-size: 1.1em;
+                float: left;
+                width: 150px;
+            }
+            .precedence {
+                color: rgb(100, 100, 100);
+                margin: 0px 0 5px 5px;
+                font-size: 1.1em;
+                float: right;
+                margin-right: 10px;
+            }
+            .desc {
+                width: 260px;
+                color: white;
+                margin-left: 5px;
+                float: left;
+                overflow: hidden;
+                font-size: 0.9em;
+            }
+            .blue {
+                background-color: blue;
+            }
+            .invisible {
+                display: none;
+            }
+            .visible {
+                display: inherit;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="app">
+            <div id="home-page">
+                <h2>todo list</h2>
+                <div id="add-button">+</div>
+                <div id="container"></div>
+            </div>
+            <div id="add-page">
+            </div>
+        </div>
+        <script type="text/javascript">
+        $(document).ready(function(){
+            let url = "http://127.0.0.1:16985/?";
+            function show(id) {
+                $(id).show();
+                $(id).siblings().hide();
+            }
+            function limit_text_len(element, len) {
+                let value = $(element).val();
+                if(value.length > len) {
+                    $(element).val(value.slice(0, len));
+                }
+            }
+            function load_home_page() {
+
+                $.get(url+$.param({"command":"fetchall"}), function(res) {
+                    show("#home-page");
+                    $("#container").empty();
+                    console.log(res);
+                    data = JSON.parse(res);
+                    for(let i of data) {
+                        let blueClass = (i[3] == '1'? "blue" : "");
+                        let desc = i[4].replaceAll("%20", " ").replaceAll("%27", "\'").replaceAll("%2C", ",");
+                        let a = $(`<div class="todo">
+                        <div id="id", class="invisible">${i[0]}</div>
+                        <div class="head">
+                        <div class="date">${i[2]}</div>
+                        <div class="precedence">${i[1]}</div>
+                        <div class="desc">${desc}</div>
+                        </div>
+                        <div class="done-button invisible ${blueClass}"></div>
+                        <div class="delete-button invisible">delete</div>
+                        </div>`);
+                        $("#container").append(a);
+                    }
+                    $(".delete-button").click(function(e) {
+                        let a = confirm("Are you sure?");
+                        if(a) {
+                            let id = $(this).siblings().filter("#id").text();
+                            $.get(url+$.param({"command":"delete", "id":id}), function(res) {
+                                console.log(res);
+                                load_home_page();
+                            });
+                        }
+                    });
+                    $(".done-button").click(function(e) {
+                        $(this).toggleClass("blue");
+                        let done = ($(this).attr("class").search("blue") != -1) * 1;
+                        let id = $(this).siblings().filter("#id").text();
+                        $.get(url+$.param({"command":"edit",
+                        "id":id,
+                        "index":"3",
+                        "value":done}), function(res) {
+                            console.log(res);
+                            load_home_page();
+                        });
+                    });
+                    $(".todo").hover(function(e){
+                        $(this).children().filter(".delete-button").toggleClass("invisible");
+                        $(this).children().filter(".done-button").toggleClass("invisible");
+                    });
+                });
+            }
+            let data;
+            load_home_page();
+            $("#add-button").click(function() {
+                show("#add-page");
+                $("#add-page").empty();
+                let view = $(`<div id="add-cancle" style="color:white;">< cancle</div>
+                    <div class="label" style="top: 50px;left: 10px;">id:</div>
+                    <input type="text" id="todo-id" class="small-input" style="top: 50px; right: 10px; width: 45px">
+                    <div class="label" style="top: 100px;left: 10px;">precedence:</div>
+                    <input type="text" id="precedence" class="small-input" style="top: 100px; right: 10px;">
+                    <div class="label" style="top: 150px;left: 10px;">date:</div>
+                    <input type="text" id="year" class="small-input" style="top: 150px; right: 100px;">
+                    <input type="text" id="month" class="small-input" style="top: 150px; right: 55px;">
+                    <input type="text" id="day" class="small-input" style="top: 150px; right: 10px;">
+                    <div class="label" style="top: 200px;left: 10px;">description:</div>
+                    <textarea id="description" class="big-input" style="top: 240px; left: 13px;"></textarea>
+                    <div class="label" id="char-left" style="top: 580px;left: 10px;">100 characters left.</div>
+                    <div id="submit">add</div>`);
+                $("#add-page").append(view);
+                $("#add-cancle").click(function() {
+                show("#home-page");
+                });
+                $("#todo-id").on("input", function(e) {
+                    limit_text_len(this, 3);
+                });
+                $("#precedence").on("input", function(e) {
+                    limit_text_len(this, 1);
+                });
+                $("#year").on("input", function(e) {
+                    limit_text_len(this, 2);
+                });
+                $("#month").on("input", function(e) {
+                    limit_text_len(this, 2);
+                });
+                $("#day").on("input", function(e) {
+                    limit_text_len(this, 2);
+                });
+                $("#description").on("input", function(e) {
+                    limit_text_len(this, 100);
+                    value = $(this).val();
+                    $("#char-left").text(`${100 - value.length} characters left.`)
+                });
+                $("#submit").click(function(e) {
+                    let params = {"command": "add"};
+                    let sibs = $(this).siblings();
+
+                    let id = $("#todo-id").val();
+                    let year = $("#year").val();
+                    let month = $("#month").val();
+                    let day = $("#day").val();
+                    let precedence = $("#precedence").val();
+                    let description = $("#description").val();
+                    if(id.length === 3) {
+                        params["id"] = id;
+                    } else {
+                        alert("length of id cell should be 3.");
+                        return;
+                    }
+                    if(precedence.length === 1) {
+                        params["precedence"] = precedence;
+                    } else {
+                        alert("length of precedence cell should be 1");
+                        return;
+                    }
+                    if(year.length === 2 && month.length === 2 && day.length === 2) {
+                        params["date"] = year+'-'+month+'-'+day;
+                    } else {
+                        alert("length of each date cell should be 2.");
+                        return;
+                    }
+                    if(description.length > 0) {
+                        params["description"] = description;
+                    } else {
+                        alert("you should enter description first.");
+                        return;
+                    }
+                    console.log($.param(params));
+                    $.get(url+$.param(params), function(res) {
+                        console.log(res);
+                        load_home_page();
+                    });
+                });
+            });
+        });
+        </script>
+    </body>
+</html>
